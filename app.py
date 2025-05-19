@@ -25,18 +25,34 @@ def index():
 
 @app.route("/feedback")
 def feedback():
-    return render_template("feedback.html")
+    return render_template("index.html")
 
 @app.route("/submit-feedback", methods=["POST"])
 def submit_feedback():
-    name = request.form.get("name")
-    email = request.form.get("email")
+    name = request.form.get("name","Anonymous")
+    email = request.form.get("email","Not known")
+    subject = request.form.get("subject", "No subject")
     message = request.form.get("message")
+
+    # Apply default values if name or email are empty
+    if not name:
+        name = 'Anonymous'
+    if not email:
+        email = 'anonymous@example.com'
+    if not subject:
+        email = 'None'
+
+    html_content = f"""
+    <p><b>Name:</b> {name}</p>
+    <p><b>Email:</b> {email}</p>
+    <p><b>Subject:</b> {subject}</p>
+    <p><b>Message:</b><br>{message.replace('\n', '<br>')}</p>
+    """
 
     msg = Message(
         subject=f"New Feedback from {name}",
         recipients=[os.getenv('MAIL_USERNAME')],  # You receive it yourself
-        body=f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}"
+        html = html_content
     )
 
     try:

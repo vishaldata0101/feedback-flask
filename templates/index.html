@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact & Feedback</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+    }
+
+    .top-right-buttons {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .top-right-buttons button {
+    font-family: 'Montserrat', sans-serif;
+      padding: 10px 16px;
+      background-color: #108899;
+      border: none;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, opacity 0.3s ease;
+      opacity: 0.9;
+    }
+
+    .top-right-buttons button:hover {
+      background-color: green;
+      opacity: 1;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 20px 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-content h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 25px;
+      border: none;
+      background-color: #f1f1f1;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+    }
+
+    .form-group textarea {
+      height: 100px;
+      border-radius: 20px;
+    }
+
+    .submit-btn {
+      display: block;
+      width: 100%;
+      background-color: #108899;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: green;
+    }
+
+    .close-btn {
+      display: block;
+      margin: 10px auto 0;
+      background-color: transparent;
+      color: #108899;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    .close-btn:hover {
+      color: red;
+    }
+
+    .flash-message {
+      text-align: center;
+      margin-top: 20px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .flash-message.success { color: #108899; }
+    .flash-message.error { color: red; }
+  </style>
+</head>
+<body>
+
+  <div class="top-right-buttons">
+    <button onclick="openModal('contactModal')">Contact Us</button>
+    <button onclick="openModal('feedbackModal')">Feedback</button>
+  </div>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-message-wrapper">
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+          <script>
+          window.onload = () => {
+            {% if category == 'error' %}
+              openModal('feedbackModal'); // show modal again
+            {% else %}
+              closeModal('feedbackModal'); // success: hide it
+            {% endif %}
+          };
+        </script>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Contact Modal -->
+  <div id="contactModal" class="modal">
+    <div class="modal-content">
+      <h2>Contact Us</h2>
+      <p><strong>Email:</strong> analytics@0101.today</p>
+      <p><strong>Phone:</strong>  +91 123-4567-789</p>
+      <p><strong>Address:</strong> Queens Mansion, Fort, Mumbai - 400001, IN</p>
+      <button class="close-btn" onclick="closeModal('contactModal')">Close</button>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div id="feedbackModal" class="modal">
+    <div class="modal-content">
+      <h2>Feedback Form</h2>
+      <form action="/submit-feedback" method="POST">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input name="name" type="text" placeholder="Enter Name" >
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input name="email" type="email" placeholder="Enter email" >
+        </div>
+        <div class="form-group">
+          <label for="subject">Subject:</label>
+          <input name="subject" type="text" placeholder="Enter subject">
+        </div>
+        <div class="form-group">
+          <label for="message">Message:</label>
+          <textarea name="message" placeholder="Enter message" required></textarea>
+        </div>
+        <button class="submit-btn" type="submit">Submit →</button>
+      </form>
+      <button class="close-btn" onclick="closeModal('feedbackModal')">Close</button>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) {
+      document.getElementById(id).style.display = "flex";
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      ['contactModal', 'feedbackModal'].forEach(id => {
+        const modal = document.getElementById(id);
+        if (event.target === modal) modal.style.display = "none";
+      });
+    };
+  </script>
+
+</body>
+</html>
